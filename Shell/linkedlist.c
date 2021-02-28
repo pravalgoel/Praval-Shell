@@ -1,5 +1,12 @@
 #include "linkedlist.h"
 #include <signal.h>
+#include<stdio.h>
+#include<sys/types.h>
+#include<stdlib.h>
+#include <string.h>
+#include"history.h"
+#include<unistd.h>
+#include<sys/wait.h>
 
 struct process *head = NULL; // linked list bangi pehla wala heal is pointing to linked list 
 struct process *curr = NULL; //
