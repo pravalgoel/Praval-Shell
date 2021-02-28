@@ -204,16 +204,14 @@ int main(int argc,char **argv)  //will take command ls -a type
 	int status; 
 
 	//sent a signal 
-    signal(SIGCHLD,signalHandler); 
-	signal(SIGQUIT,printCommands); // ctrl+\              
+    signal(SIGCHLD,signalHandler);               
 	do{
 		
-		printf("GHANSHYAM-SHELL > ");
+		printf("PRAVAL-SHELL > ");
 		line=shell_read_line();
 		args=shell_split_line(line);
 		status=shell_execute(args);
 		
-		insertCommand(line,0);
 
 		free(line);
 		free(args);
