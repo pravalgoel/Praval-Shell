@@ -1,12 +1,13 @@
 #include<stdio.h>
+#include<sys/types.h>
+#include<signal.h>
 #include<stdlib.h>
 #include <string.h>
+#include"history.h"
 #include<unistd.h>
 #include<sys/wait.h>
-#include<sys/types.h>
 #include"linkedlist.h"
-#include"history.h"
-#include<signal.h>
+
  
 int shell_cd(char** args)
 {
@@ -24,9 +25,14 @@ int shell_exit(char **args)
 }
 
 process* headProcess=NULL;
+void shell_running(){
+	for(int i=0; i<10; i++){
+	}
+}
 int shell_bg(char **args)
 {
-//args -- bg echo "hello"
+
+	//args -- bg echo "hello"
     ++args;
 //args -- echo "hello"
     char *firstCmd= args[0];//echo
@@ -59,6 +65,7 @@ int shell_kill(char **args)
 {
     // kill 1575
     char* pidCmd=args[1];
+	shell_running();
     if(!pidCmd)    printf("Please specify a pid\n");
     
     else
@@ -88,12 +95,14 @@ char *shell_read_line()
 {
 	char*line=NULL;
 	ssize_t bufsize =0;
+	shell_running();
 	if(getline(&line,&bufsize,stdin)==-1)
 	{
 		if(feof(stdin))  exit(EXIT_SUCCESS);
 		else
 		{
 			perror("acm-shell: getline\n");
+			shell_running();
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -105,18 +114,22 @@ char *shell_read_line()
 
 char** shell_split_line(char* line)
 {
-	int bufsize=SHELL_TOKEN_BUFSIZE,position=0;        
-	char ** tokens=malloc(bufsize * sizeof(char*));   
+	int bufsize=SHELL_TOKEN_BUFSIZE,position=0;
+	shell_running();
+	char ** tokens=malloc(bufsize * sizeof(char*)); 
+	shell_running();
 	char *token; 
 
 	if(!token)            // doubt
 	{
-		fprintf(stderr,"acm-shell: allocation error\n");     
+		fprintf(stderr,"acm-shell: allocation error\n");
+		shell_running();
 		exit(EXIT_FAILURE);
 	}
 
 	//strtok :- Library Function 
 	token=strtok(line,SHELL_TOK_DELIM); // cd a 
+	shell_running();
 	while(token!=NULL)
 	{
 		tokens[position]=token;
@@ -132,7 +145,7 @@ int shell_launch(char **args)
 {
 	pid_t pid;
 	int status;
-
+	shell_running();
 	pid=fork();
 	if(pid==0)
 	{
@@ -146,6 +159,7 @@ int shell_launch(char **args)
 		do
 		{
 			waitpid(pid,&status,WUNTRACED);
+			shell_running();
 		}
 		while(!WIFEXITED(status)&&!WIFSIGNALED(status));
 	}
@@ -155,10 +169,12 @@ int shell_launch(char **args)
 int shell_execute(char ** args)
 {
 	int i;
+	shell_running();
 	if(args[0]==NULL)  return 1;
 
 	for(int i=0;i<5;i++) 
 	{
+		shell_running();
 		if(strcmp(args[0],builtin_str[i])==0)  // false 0	if both strings are identical (equal)
 			return (*builtin_func[i])(args);       //....
 	}
@@ -182,12 +198,13 @@ void broadcastTermination(int pid,int status){
     {
         printf("continued\n");
     }
+	shell_running();
     delete_from_list(pid); // where is the list
 }
 
 static void signalHandler(int sig){
     int pid;
-    int status;
+    int status;shell_running();
     pid=waitpid(-1,&status,WNOHANG);  // pid_t waitpid(pid_t pid, int *status ((LIKE NULL)), int options((how to wait))); 
 									  //-1: Wait for any child process., WNOHANG: Return immediately if no child has exited.
     broadcastTermination(pid,status); //
