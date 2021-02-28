@@ -1,4 +1,13 @@
 #include "utilities.h"
+#include<stdio.h>
+#include<sys/types.h>
+#include<signal.h>
+#include<stdlib.h>
+#include <string.h>
+#include"history.h"
+#include<unistd.h>
+#include<sys/wait.h>
+#include"linkedlist.h"
 
 //======= Constants ==========
 static int const MAX_LINE_LENGTH = 100;
